@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
 
-@Path("/hera-api/usuarios")
+@Path("/flux/usuarios")
 public class UsuarioResource {
     private UsuarioBO usuarioBO;
 

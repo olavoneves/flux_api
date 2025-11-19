@@ -10,7 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/hera-api/login")
+@Path("/flux/login")
 public class LoginResource {
     private LoginBO loginBO;
 

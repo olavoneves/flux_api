@@ -31,7 +31,7 @@ public class UsuarioDAO {
     }
 
     public UsuarioTO update(UsuarioTO usuario) {
-        String sql = "UPDATE T_FLUX_USUARIO SET nm_email = ?, ds_senha_hash = ?, nm_completo = ?, ds_cargo_atual = ?, ds_carreira_alvo = ?, dt_cadastro = ?, dt_ultima_atualizacao = ?, st_ativo = ? WHERE id_usuario = ?";
+        String sql = "UPDATE T_FLUX_USUARIO SET nm_email = ?, ds_senha_hash = ?, nm_completo = ?, ds_cargo_atual = ?, ds_carreira_alvo = ? WHERE id_usuario = ?";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, usuario.getEmail());
@@ -39,10 +39,7 @@ public class UsuarioDAO {
             preparedStatement.setString(3, usuario.getNomeCompleto());
             preparedStatement.setString(4, usuario.getCargoAtual());
             preparedStatement.setString(5, usuario.getCarreiraAlvo());
-            preparedStatement.setDate(6, Date.valueOf(usuario.getDataCadastro()));
-            preparedStatement.setDate(7, Date.valueOf(usuario.getDataUltimaAtualizacao()));
-            preparedStatement.setString(8, String.valueOf(usuario.getAtivo()));
-            preparedStatement.setLong(9, usuario.getId());
+            preparedStatement.setLong(6, usuario.getId());
             if (preparedStatement.executeUpdate() > 0) {
                 return usuario;
             } else {

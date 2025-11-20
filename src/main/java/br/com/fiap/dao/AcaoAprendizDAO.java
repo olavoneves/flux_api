@@ -1,6 +1,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.to.AcaoAprendizTO;
+import br.com.fiap.to.UsuarioTO;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -45,7 +46,8 @@ public class AcaoAprendizDAO {
             preparedStatement.setInt(5, acaoAprendiz.getValorPrioridade());
             preparedStatement.setString(6, acaoAprendiz.getStatus());
             preparedStatement.setDate(7, Date.valueOf(acaoAprendiz.getDataCriacao()));
-            preparedStatement.setLong(8, acaoAprendiz.getId());
+            preparedStatement.setDate(8, Date.valueOf(acaoAprendiz.getDataConclusao()));
+            preparedStatement.setLong(9, acaoAprendiz.getId());
             if (preparedStatement.executeUpdate() > 0) {
                 return acaoAprendiz;
             } else {
@@ -84,7 +86,19 @@ public class AcaoAprendizDAO {
 
             if (resultSet.next()) {
                 acaoAprendiz = new AcaoAprendizTO();
+                acaoAprendiz.setId(resultSet.getLong("id_acao"));
 
+                UsuarioDAO usuarioDAO =  new UsuarioDAO();
+                UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
+                acaoAprendiz.setUsuario(usuario);
+
+                acaoAprendiz.setTipoAcao(resultSet.getString("tp_acao"));
+                acaoAprendiz.setAcao(resultSet.getString("ds_acao"));
+                acaoAprendiz.setNomeCompetenciaAlvo(resultSet.getString("nm_competencia_alvo"));
+                acaoAprendiz.setValorPrioridade(resultSet.getInt("vl_prioridade"));
+                acaoAprendiz.setStatus(resultSet.getString("st_status"));
+                acaoAprendiz.setDataCriacao(resultSet.getDate("dt_criacao").toLocalDate());
+                acaoAprendiz.setDataConclusao(resultSet.getDate("dt_conclusao").toLocalDate());
             } else {
                 return null;
             }
@@ -107,7 +121,19 @@ public class AcaoAprendizDAO {
             if (resultSet != null) {
                 while (resultSet.next()) {
                     AcaoAprendizTO acaoAprendiz = new AcaoAprendizTO();
+                    acaoAprendiz.setId(resultSet.getLong("id_acao"));
 
+                    UsuarioDAO usuarioDAO =  new UsuarioDAO();
+                    UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
+                    acaoAprendiz.setUsuario(usuario);
+
+                    acaoAprendiz.setTipoAcao(resultSet.getString("tp_acao"));
+                    acaoAprendiz.setAcao(resultSet.getString("ds_acao"));
+                    acaoAprendiz.setNomeCompetenciaAlvo(resultSet.getString("nm_competencia_alvo"));
+                    acaoAprendiz.setValorPrioridade(resultSet.getInt("vl_prioridade"));
+                    acaoAprendiz.setStatus(resultSet.getString("st_status"));
+                    acaoAprendiz.setDataCriacao(resultSet.getDate("dt_criacao").toLocalDate());
+                    acaoAprendiz.setDataConclusao(resultSet.getDate("dt_conclusao").toLocalDate());
                     acaoAprendizes.add(acaoAprendiz);
                 }
             } else {

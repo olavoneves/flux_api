@@ -2,6 +2,7 @@ package br.com.fiap.dao;
 
 import br.com.fiap.to.AcaoAprendizTO;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,17 +10,24 @@ import java.util.ArrayList;
 public class AcaoAprendizDAO {
 
     public AcaoAprendizTO save(AcaoAprendizTO acaoAprendiz) {
-        String sql = "INSERT INTO T_FLUX_USUARIO(nm_email, ds_senha_hash, nm_completo) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO T_FLUX_ACAO_APRENDIZ(id_usuario, tp_acao, ds_acao, nm_competencia_alvo, vl_prioridade, st_status, dt_criacao, dt_conclusao) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
-
+            preparedStatement.setLong(1, acaoAprendiz.getUsuario().getId());
+            preparedStatement.setString(2, acaoAprendiz.getTipoAcao());
+            preparedStatement.setString(3, acaoAprendiz.getAcao());
+            preparedStatement.setString(4, acaoAprendiz.getNomeCompetenciaAlvo());
+            preparedStatement.setInt(5, acaoAprendiz.getValorPrioridade());
+            preparedStatement.setString(6, acaoAprendiz.getStatus());
+            preparedStatement.setDate(7, Date.valueOf(acaoAprendiz.getDataCriacao()));
+            preparedStatement.setDate(8, Date.valueOf(acaoAprendiz.getDataConclusao()));
             if (preparedStatement.executeUpdate() > 0) {
                 return acaoAprendiz;
             } else {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao criar usuario: " + e.getMessage());
+            System.out.println("Erro ao criar ação aprendiz: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -27,18 +35,24 @@ public class AcaoAprendizDAO {
     }
 
     public AcaoAprendizTO update(AcaoAprendizTO acaoAprendiz) {
-        String sql = "UPDATE T_FLUX_USUARIO SET nm_email = ?, ds_senha_hash = ?, nm_completo = ?, ds_cargo_atual = ?, ds_carreira_alvo = ? WHERE id_usuario = ?";
+        String sql = "UPDATE T_FLUX_ACAO_APRENDIZ SET id_usuario = ?, tp_acao = ?, ds_acao = ?, nm_competencia_alvo = ?, vl_prioridade = ?, st_status = ?, dt_criacao = ?, dt_conclusao = ? WHERE id_acao = ?";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
-
-            preparedStatement.setLong(6, acaoAprendiz.getId());
+            preparedStatement.setLong(1, acaoAprendiz.getUsuario().getId());
+            preparedStatement.setString(2, acaoAprendiz.getTipoAcao());
+            preparedStatement.setString(3, acaoAprendiz.getAcao());
+            preparedStatement.setString(4, acaoAprendiz.getNomeCompetenciaAlvo());
+            preparedStatement.setInt(5, acaoAprendiz.getValorPrioridade());
+            preparedStatement.setString(6, acaoAprendiz.getStatus());
+            preparedStatement.setDate(7, Date.valueOf(acaoAprendiz.getDataCriacao()));
+            preparedStatement.setLong(8, acaoAprendiz.getId());
             if (preparedStatement.executeUpdate() > 0) {
                 return acaoAprendiz;
             } else {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao atualizar usuario: " + e.getMessage());
+            System.out.println("Erro ao atualizar ação aprendiz: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -46,14 +60,14 @@ public class AcaoAprendizDAO {
     }
 
     public boolean delete(Long id) {
-        String sql = "DELETE FROM T_FLUX_USUARIO WHERE id_usuario = ?";
+        String sql = "DELETE FROM T_FLUX_ACAO_APRENDIZ WHERE id_acao = ?";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             return preparedStatement.executeUpdate() > 0;
 
         } catch (Exception e) {
-            System.out.println("Erro ao excluir usuario: " + e.getMessage());
+            System.out.println("Erro ao excluir ação aprendiz: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -61,7 +75,7 @@ public class AcaoAprendizDAO {
     }
 
     public AcaoAprendizTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_USUARIO WHERE id_usuario = ?";
+        String sql = "SELECT * FROM T_FLUX_ACAO_APRENDIZ WHERE id_acao = ?";
         AcaoAprendizTO acaoAprendiz = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -76,7 +90,7 @@ public class AcaoAprendizDAO {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao buscar usuario: " + e.getMessage());
+            System.out.println("Erro ao buscar ação aprendiz: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -84,7 +98,7 @@ public class AcaoAprendizDAO {
     }
 
     public ArrayList<AcaoAprendizTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_USUARIO ORDER BY id_usuario";
+        String sql = "SELECT * FROM T_FLUX_ACAO_APRENDIZ ORDER BY id_acao";
         ArrayList<AcaoAprendizTO> acaoAprendizes = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -101,7 +115,7 @@ public class AcaoAprendizDAO {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao buscar usuarios: " + e.getMessage());
+            System.out.println("Erro ao buscar ações aprendizes: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }

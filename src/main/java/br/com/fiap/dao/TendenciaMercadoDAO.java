@@ -1,7 +1,9 @@
 package br.com.fiap.dao;
 
+import br.com.fiap.to.CarreiraTO;
 import br.com.fiap.to.TendenciaMercadoTO;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,17 +11,22 @@ import java.util.ArrayList;
 public class TendenciaMercadoDAO {
 
     public TendenciaMercadoTO save(TendenciaMercadoTO tendenciaMercado) {
-        String sql = "INSERT INTO T_FLUX_USUARIO(nm_email, ds_senha_hash, nm_completo) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO T_FLUX_TENDENCIA_MERCADO(id_carreira, nm_competencia, vl_demanda, vl_crescimento_30d, dt_referencia, dt_calculo) VALUES(?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
-
+            preparedStatement.setLong(1, tendenciaMercado.getCarreira().getId());
+            preparedStatement.setString(2, tendenciaMercado.getNomeCompetencia());
+            preparedStatement.setInt(3, tendenciaMercado.getValorDemanda());
+            preparedStatement.setInt(4, tendenciaMercado.getValorCrescimentoTrintaDias());
+            preparedStatement.setDate(5, Date.valueOf(tendenciaMercado.getDataReferencia()));
+            preparedStatement.setDate(6, Date.valueOf(tendenciaMercado.getDataCalculo()));
             if (preparedStatement.executeUpdate() > 0) {
                 return tendenciaMercado;
             } else {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao criar usuario: " + e.getMessage());
+            System.out.println("Erro ao criar tendencia de mercado: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -27,18 +34,23 @@ public class TendenciaMercadoDAO {
     }
 
     public TendenciaMercadoTO update(TendenciaMercadoTO tendenciaMercado) {
-        String sql = "UPDATE T_FLUX_USUARIO SET nm_email = ?, ds_senha_hash = ?, nm_completo = ?, ds_cargo_atual = ?, ds_carreira_alvo = ? WHERE id_usuario = ?";
+        String sql = "UPDATE T_FLUX_TENDENCIA_MERCADO SET id_carreira = ?, nm_competencia = ?, vl_demanda = ?, vl_crescimento_30d = ?, dt_referencia = ?, dt_calculo = ? WHERE id_tendencia = ?";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
-
-            preparedStatement.setLong(6, tendenciaMercado.getId());
+            preparedStatement.setLong(1, tendenciaMercado.getCarreira().getId());
+            preparedStatement.setString(2, tendenciaMercado.getNomeCompetencia());
+            preparedStatement.setInt(3, tendenciaMercado.getValorDemanda());
+            preparedStatement.setInt(4, tendenciaMercado.getValorCrescimentoTrintaDias());
+            preparedStatement.setDate(5, Date.valueOf(tendenciaMercado.getDataReferencia()));
+            preparedStatement.setDate(6, Date.valueOf(tendenciaMercado.getDataCalculo()));
+            preparedStatement.setLong(7, tendenciaMercado.getId());
             if (preparedStatement.executeUpdate() > 0) {
                 return tendenciaMercado;
             } else {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao atualizar usuario: " + e.getMessage());
+            System.out.println("Erro ao atualizar tendencia de mercado: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -46,14 +58,14 @@ public class TendenciaMercadoDAO {
     }
 
     public boolean delete(Long id) {
-        String sql = "DELETE FROM T_FLUX_USUARIO WHERE id_usuario = ?";
+        String sql = "DELETE FROM T_FLUX_TENDENCIA_MERCADO WHERE id_tendencia = ?";
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             return preparedStatement.executeUpdate() > 0;
 
         } catch (Exception e) {
-            System.out.println("Erro ao excluir usuario: " + e.getMessage());
+            System.out.println("Erro ao excluir tendencia de mercado: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -61,7 +73,7 @@ public class TendenciaMercadoDAO {
     }
 
     public TendenciaMercadoTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_USUARIO WHERE id_usuario = ?";
+        String sql = "SELECT * FROM T_FLUX_TENDENCIA_MERCADO WHERE id_tendencia = ?";
         TendenciaMercadoTO tendenciaMercado = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -70,13 +82,23 @@ public class TendenciaMercadoDAO {
 
             if (resultSet.next()) {
                 tendenciaMercado = new TendenciaMercadoTO();
+                tendenciaMercado.setId(resultSet.getLong("id_tendencia"));
 
+                CarreiraDAO carreiraDAO = new CarreiraDAO();
+                CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
+                tendenciaMercado.setCarreira(carreira);
+
+                tendenciaMercado.setNomeCompetencia(resultSet.getString("nm_competencia"));
+                tendenciaMercado.setValorDemanda(resultSet.getInt("vl_demanda"));
+                tendenciaMercado.setValorCrescimentoTrintaDias(resultSet.getInt("vl_crescimento_30d"));
+                tendenciaMercado.setDataReferencia(resultSet.getDate("dt_referencia").toLocalDate());
+                tendenciaMercado.setDataCalculo(resultSet.getDate("dt_calculo").toLocalDate());
             } else {
                 return null;
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao buscar usuario: " + e.getMessage());
+            System.out.println("Erro ao buscar tendencia de mercado: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -84,7 +106,7 @@ public class TendenciaMercadoDAO {
     }
 
     public ArrayList<TendenciaMercadoTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_USUARIO ORDER BY id_usuario";
+        String sql = "SELECT * FROM T_FLUX_TENDENCIA_MERCADO ORDER BY id_tendencia";
         ArrayList<TendenciaMercadoTO> tendenciasMercado = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -93,7 +115,17 @@ public class TendenciaMercadoDAO {
             if (resultSet != null) {
                 while (resultSet.next()) {
                     TendenciaMercadoTO tendenciaMercado = new TendenciaMercadoTO();
+                    tendenciaMercado.setId(resultSet.getLong("id_tendencia"));
 
+                    CarreiraDAO carreiraDAO = new CarreiraDAO();
+                    CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
+                    tendenciaMercado.setCarreira(carreira);
+
+                    tendenciaMercado.setNomeCompetencia(resultSet.getString("nm_competencia"));
+                    tendenciaMercado.setValorDemanda(resultSet.getInt("vl_demanda"));
+                    tendenciaMercado.setValorCrescimentoTrintaDias(resultSet.getInt("vl_crescimento_30d"));
+                    tendenciaMercado.setDataReferencia(resultSet.getDate("dt_referencia").toLocalDate());
+                    tendenciaMercado.setDataCalculo(resultSet.getDate("dt_calculo").toLocalDate());
                     tendenciasMercado.add(tendenciaMercado);
                 }
             } else {
@@ -101,7 +133,7 @@ public class TendenciaMercadoDAO {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao buscar usuarios: " + e.getMessage());
+            System.out.println("Erro ao buscar tendencias de mercado: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }

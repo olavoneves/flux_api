@@ -68,7 +68,24 @@ public class CarreiraCompetenciaDAO {
     }
 
     public CarreiraCompetenciaTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_CARREIRA_COMPETENCIA WHERE id_carreira_comp = ?";
+        String sql = """
+                SELECT
+                    cc.id_carreira_comp,
+                    cc.id_carreira,
+                    cc.nm_competencia,
+                    cc.vl_importancia,
+                    cc.st_essencial,
+                    c.nm_carreira,
+                    c.ds_descricao,
+                    c.vl_crescimento,
+                    c.vl_salario_medio,
+                    c.dt_emergente_desde,
+                    c.dt_atualizacao,
+                    c.st_ativo
+                FROM T_FLUX_CARREIRA_COMPETENCIA cc
+                INNER JOIN T_FLUX_CARREIRA c ON cc.id_carreira = c.id_carreira
+                WHERE cc.id_carreira_comp = ?
+                """;
         CarreiraCompetenciaTO carreiraCompetencia = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -79,10 +96,17 @@ public class CarreiraCompetenciaDAO {
                 carreiraCompetencia = new CarreiraCompetenciaTO();
                 carreiraCompetencia.setId(resultSet.getLong("id_carreira_comp"));
 
-                CarreiraDAO carreiraDAO = new CarreiraDAO();
-                CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
-                carreiraCompetencia.setCarreira(carreira);
+                CarreiraTO carreira = new CarreiraTO();
+                carreira.setId(resultSet.getLong("id_carreira"));
+                carreira.setNomeCarreira(resultSet.getString("nm_carreira"));
+                carreira.setDescricao(resultSet.getString("ds_descricao"));
+                carreira.setValorCrescimento(resultSet.getInt("vl_crescimento"));
+                carreira.setValorSalarioMedio(resultSet.getInt("vl_salario_medio"));
+                carreira.setDataEmergenteDesde(resultSet.getDate("dt_emergente_desde").toLocalDate());
+                carreira.setDataAtualizacao(resultSet.getDate("dt_atualizacao").toLocalDate());
+                carreira.setAtivo(resultSet.getString("st_ativo").charAt(0));
 
+                carreiraCompetencia.setCarreira(carreira);
                 carreiraCompetencia.setNomeCompetencia(resultSet.getString("nm_competencia"));
                 carreiraCompetencia.setImportancia(resultSet.getInt("vl_importancia"));
                 carreiraCompetencia.setEssencial(resultSet.getString("st_essencial").charAt(0));
@@ -99,7 +123,24 @@ public class CarreiraCompetenciaDAO {
     }
 
     public ArrayList<CarreiraCompetenciaTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_CARREIRA_COMPETENCIA ORDER BY id_carreira_comp";
+        String sql = """
+                SELECT
+                    cc.id_carreira_comp,
+                    cc.id_carreira,
+                    cc.nm_competencia,
+                    cc.vl_importancia,
+                    cc.st_essencial,
+                    c.nm_carreira,
+                    c.ds_descricao,
+                    c.vl_crescimento,
+                    c.vl_salario_medio,
+                    c.dt_emergente_desde,
+                    c.dt_atualizacao,
+                    c.st_ativo
+                FROM T_FLUX_CARREIRA_COMPETENCIA cc
+                INNER JOIN T_FLUX_CARREIRA c ON cc.id_carreira = c.id_carreira
+                ORDER BY cc.id_carreira_comp
+                """;
         ArrayList<CarreiraCompetenciaTO> carreiraCompetencias = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -110,10 +151,17 @@ public class CarreiraCompetenciaDAO {
                     CarreiraCompetenciaTO carreiraCompetencia = new CarreiraCompetenciaTO();
                     carreiraCompetencia.setId(resultSet.getLong("id_carreira_comp"));
 
-                    CarreiraDAO carreiraDAO = new CarreiraDAO();
-                    CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
-                    carreiraCompetencia.setCarreira(carreira);
+                    CarreiraTO carreira = new CarreiraTO();
+                    carreira.setId(resultSet.getLong("id_carreira"));
+                    carreira.setNomeCarreira(resultSet.getString("nm_carreira"));
+                    carreira.setDescricao(resultSet.getString("ds_descricao"));
+                    carreira.setValorCrescimento(resultSet.getInt("vl_crescimento"));
+                    carreira.setValorSalarioMedio(resultSet.getInt("vl_salario_medio"));
+                    carreira.setDataEmergenteDesde(resultSet.getDate("dt_emergente_desde").toLocalDate());
+                    carreira.setDataAtualizacao(resultSet.getDate("dt_atualizacao").toLocalDate());
+                    carreira.setAtivo(resultSet.getString("st_ativo").charAt(0));
 
+                    carreiraCompetencia.setCarreira(carreira);
                     carreiraCompetencia.setNomeCompetencia(resultSet.getString("nm_competencia"));
                     carreiraCompetencia.setImportancia(resultSet.getInt("vl_importancia"));
                     carreiraCompetencia.setEssencial(resultSet.getString("st_essencial").charAt(0));

@@ -77,7 +77,24 @@ public class AcaoAprendizDAO {
     }
 
     public AcaoAprendizTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_ACAO_APRENDIZ WHERE id_acao = ?";
+        String sql = """
+                SELECT
+                    a.id_acao,
+                    a.tp_acao,
+                    a.ds_acao,
+                    a.nm_competencia_alvo,
+                    a.vl_prioridade,
+                    a.st_status,
+                    a.dt_criacao,
+                    a.dt_conclusao,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo,
+                    u.ds_cargo_atual
+                FROM T_FLUX_ACAO_APRENDIZ a
+                INNER JOIN T_FLUX_USUARIO u ON a.id_usuario = u.id_usuario
+                WHERE a.id_acao = ?
+                """;
         AcaoAprendizTO acaoAprendiz = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -88,10 +105,13 @@ public class AcaoAprendizDAO {
                 acaoAprendiz = new AcaoAprendizTO();
                 acaoAprendiz.setId(resultSet.getLong("id_acao"));
 
-                UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                acaoAprendiz.setUsuario(usuario);
+                UsuarioTO usuario = new UsuarioTO();
+                usuario.setId(resultSet.getLong("id_usuario"));
+                usuario.setEmail(resultSet.getString("nm_email"));
+                usuario.setNomeCompleto(resultSet.getString("nm_completo"));
+                usuario.setCargoAtual(resultSet.getString("ds_cargo_atual"));
 
+                acaoAprendiz.setUsuario(usuario);
                 acaoAprendiz.setTipoAcao(resultSet.getString("tp_acao"));
                 acaoAprendiz.setAcao(resultSet.getString("ds_acao"));
                 acaoAprendiz.setNomeCompetenciaAlvo(resultSet.getString("nm_competencia_alvo"));
@@ -112,7 +132,23 @@ public class AcaoAprendizDAO {
     }
 
     public ArrayList<AcaoAprendizTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_ACAO_APRENDIZ ORDER BY id_acao";
+        String sql = """
+                SELECT
+                    a.id_acao,
+                    a.tp_acao,
+                    a.ds_acao,
+                    a.nm_competencia_alvo,
+                    a.vl_prioridade,
+                    a.st_status,
+                    a.dt_criacao,
+                    a.dt_conclusao,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo,
+                    u.ds_cargo_atual
+                FROM T_FLUX_ACAO_APRENDIZ a
+                INNER JOIN T_FLUX_USUARIO u ON a.id_usuario = u.id_usuario
+                """;
         ArrayList<AcaoAprendizTO> acaoAprendizes = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -123,10 +159,13 @@ public class AcaoAprendizDAO {
                     AcaoAprendizTO acaoAprendiz = new AcaoAprendizTO();
                     acaoAprendiz.setId(resultSet.getLong("id_acao"));
 
-                    UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                    UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                    acaoAprendiz.setUsuario(usuario);
+                    UsuarioTO usuario = new UsuarioTO();
+                    usuario.setId(resultSet.getLong("id_usuario"));
+                    usuario.setEmail(resultSet.getString("nm_email"));
+                    usuario.setNomeCompleto(resultSet.getString("nm_completo"));
+                    usuario.setCargoAtual(resultSet.getString("ds_cargo_atual"));
 
+                    acaoAprendiz.setUsuario(usuario);
                     acaoAprendiz.setTipoAcao(resultSet.getString("tp_acao"));
                     acaoAprendiz.setAcao(resultSet.getString("ds_acao"));
                     acaoAprendiz.setNomeCompetenciaAlvo(resultSet.getString("nm_competencia_alvo"));

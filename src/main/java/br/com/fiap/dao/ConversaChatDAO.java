@@ -71,7 +71,20 @@ public class ConversaChatDAO {
     }
 
     public ConversaChatTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_CONVERSA_CHAT WHERE id_mensagem = ?";
+        String sql = """
+                SELECT
+                    chat.id_mensagem,
+                    chat.ds_mensagem_user,
+                    chat.ds_resposta_bot,
+                    chat.ds_contexto,
+                    chat.dt_envio,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo
+                FROM T_FLUX_CONVERSA_CHAT chat
+                INNER JOIN T_FLUX_USUARIO u ON chat.id_usuario = u.id_usuario
+                WHERE chat.id_mensagem = ?
+                """;
         ConversaChatTO conversaChat = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -82,10 +95,12 @@ public class ConversaChatDAO {
                 conversaChat = new ConversaChatTO();
                 conversaChat.setId(resultSet.getLong("id_mensagem"));
 
-                UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                conversaChat.setUsuario(usuario);
+                UsuarioTO usuario = new UsuarioTO();
+                usuario.setId(resultSet.getLong("id_usuario"));
+                usuario.setEmail(resultSet.getString("nm_email"));
+                usuario.setNomeCompleto(resultSet.getString("nm_completo"));
 
+                conversaChat.setUsuario(usuario);
                 conversaChat.setMensagemUser(resultSet.getString("ds_mensagem_user"));
                 conversaChat.setRespostaBot(resultSet.getString("ds_resposta_bot"));
                 conversaChat.setContexto(resultSet.getString("ds_contexto"));
@@ -103,7 +118,20 @@ public class ConversaChatDAO {
     }
 
     public ArrayList<ConversaChatTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_CONVERSA_CHAT ORDER BY id_mensagem";
+        String sql = """
+                SELECT
+                    chat.id_mensagem,
+                    chat.ds_mensagem_user,
+                    chat.ds_resposta_bot,
+                    chat.ds_contexto,
+                    chat.dt_envio,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo
+                FROM T_FLUX_CONVERSA_CHAT chat
+                INNER JOIN T_FLUX_USUARIO u ON chat.id_usuario = u.id_usuario
+                ORDER BY chat.id_mensagem
+                """;
         ArrayList<ConversaChatTO> conversaChats = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -114,10 +142,12 @@ public class ConversaChatDAO {
                     ConversaChatTO conversaChat = new ConversaChatTO();
                     conversaChat.setId(resultSet.getLong("id_mensagem"));
 
-                    UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                    UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                    conversaChat.setUsuario(usuario);
+                    UsuarioTO usuario = new UsuarioTO();
+                    usuario.setId(resultSet.getLong("id_usuario"));
+                    usuario.setEmail(resultSet.getString("nm_email"));
+                    usuario.setNomeCompleto(resultSet.getString("nm_completo"));
 
+                    conversaChat.setUsuario(usuario);
                     conversaChat.setMensagemUser(resultSet.getString("ds_mensagem_user"));
                     conversaChat.setRespostaBot(resultSet.getString("ds_resposta_bot"));
                     conversaChat.setContexto(resultSet.getString("ds_contexto"));

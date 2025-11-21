@@ -73,7 +73,21 @@ public class TendenciaMercadoDAO {
     }
 
     public TendenciaMercadoTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_TENDENCIA_MERCADO WHERE id_tendencia = ?";
+        String sql = """
+                SELECT
+                    t.id_tendencia,
+                    t.nm_competencia,
+                    t.vl_demanda,
+                    t.vl_crescimento_30d,
+                    t.dt_referencia,
+                    t.dt_calculo,
+                    c.id_carreira,
+                    c.nm_carreira,
+                    c.vl_crescimento
+                FROM T_FLUX_TENDENCIA_MERCADO t
+                INNER JOIN T_FLUX_CARREIRA c ON t.id_carreira = c.id_carreira
+                WHERE t.id_tendencia = ?
+                """;
         TendenciaMercadoTO tendenciaMercado = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -84,10 +98,12 @@ public class TendenciaMercadoDAO {
                 tendenciaMercado = new TendenciaMercadoTO();
                 tendenciaMercado.setId(resultSet.getLong("id_tendencia"));
 
-                CarreiraDAO carreiraDAO = new CarreiraDAO();
-                CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
-                tendenciaMercado.setCarreira(carreira);
+                CarreiraTO carreira = new CarreiraTO();
+                carreira.setId(resultSet.getLong("id_carreira"));
+                carreira.setNomeCarreira(resultSet.getString("nm_carreira"));
+                carreira.setValorCrescimento(resultSet.getInt("vl_crescimento"));
 
+                tendenciaMercado.setCarreira(carreira);
                 tendenciaMercado.setNomeCompetencia(resultSet.getString("nm_competencia"));
                 tendenciaMercado.setValorDemanda(resultSet.getInt("vl_demanda"));
                 tendenciaMercado.setValorCrescimentoTrintaDias(resultSet.getInt("vl_crescimento_30d"));
@@ -106,7 +122,21 @@ public class TendenciaMercadoDAO {
     }
 
     public ArrayList<TendenciaMercadoTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_TENDENCIA_MERCADO ORDER BY id_tendencia";
+        String sql = """
+                SELECT
+                    t.id_tendencia,
+                    t.nm_competencia,
+                    t.vl_demanda,
+                    t.vl_crescimento_30d,
+                    t.dt_referencia,
+                    t.dt_calculo,
+                    c.id_carreira,
+                    c.nm_carreira,
+                    c.vl_crescimento
+                FROM T_FLUX_TENDENCIA_MERCADO t
+                INNER JOIN T_FLUX_CARREIRA c ON t.id_carreira = c.id_carreira
+                ORDER BY t.id_tendencia
+                """;
         ArrayList<TendenciaMercadoTO> tendenciasMercado = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -117,10 +147,12 @@ public class TendenciaMercadoDAO {
                     TendenciaMercadoTO tendenciaMercado = new TendenciaMercadoTO();
                     tendenciaMercado.setId(resultSet.getLong("id_tendencia"));
 
-                    CarreiraDAO carreiraDAO = new CarreiraDAO();
-                    CarreiraTO carreira = carreiraDAO.findById(resultSet.getLong("id_carreira"));
-                    tendenciaMercado.setCarreira(carreira);
+                    CarreiraTO carreira = new CarreiraTO();
+                    carreira.setId(resultSet.getLong("id_carreira"));
+                    carreira.setNomeCarreira(resultSet.getString("nm_carreira"));
+                    carreira.setValorCrescimento(resultSet.getInt("vl_crescimento"));
 
+                    tendenciaMercado.setCarreira(carreira);
                     tendenciaMercado.setNomeCompetencia(resultSet.getString("nm_competencia"));
                     tendenciaMercado.setValorDemanda(resultSet.getInt("vl_demanda"));
                     tendenciaMercado.setValorCrescimentoTrintaDias(resultSet.getInt("vl_crescimento_30d"));

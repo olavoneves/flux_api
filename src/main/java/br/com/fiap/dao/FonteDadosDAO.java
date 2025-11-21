@@ -73,7 +73,21 @@ public class FonteDadosDAO {
     }
 
     public FonteDadosTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_FONTE_DADOS WHERE id_fonte = ?";
+        String sql = """
+                SELECT
+                    f.id_fonte,
+                    f.tp_fonte,
+                    f.ds_identificador,
+                    f.dt_conexao,
+                    f.dt_ultima_sync,
+                    f.st_ativo,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo
+                FROM T_FLUX_FONTE_DADOS f
+                INNER JOIN T_FLUX_USUARIO u ON f.id_usuario = u.id_usuario
+                WHERE f.id_fonte = ?
+                """;
         FonteDadosTO fonteDados = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -84,10 +98,12 @@ public class FonteDadosDAO {
                 fonteDados = new FonteDadosTO();
                 fonteDados.setId(resultSet.getLong("id_fonte"));
 
-                UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                fonteDados.setUsuario(usuario);
+                UsuarioTO usuario = new UsuarioTO();
+                usuario.setId(resultSet.getLong("id_usuario"));
+                usuario.setEmail(resultSet.getString("nm_email"));
+                usuario.setNomeCompleto(resultSet.getString("nm_completo"));
 
+                fonteDados.setUsuario(usuario);
                 fonteDados.setFonte(resultSet.getString("tp_fonte"));
                 fonteDados.setIdentificador(resultSet.getString("ds_identificador"));
                 fonteDados.setDataConexao(resultSet.getDate("dt_conexao").toLocalDate());
@@ -106,7 +122,21 @@ public class FonteDadosDAO {
     }
 
     public ArrayList<FonteDadosTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_FONTE_DADOS ORDER BY id_fonte";
+        String sql = """
+                SELECT
+                    f.id_fonte,
+                    f.tp_fonte,
+                    f.ds_identificador,
+                    f.dt_conexao,
+                    f.dt_ultima_sync,
+                    f.st_ativo,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo
+                FROM T_FLUX_FONTE_DADOS f
+                INNER JOIN T_FLUX_USUARIO u ON f.id_usuario = u.id_usuario
+                ORDER BY f.id_fonte
+                """;
         ArrayList<FonteDadosTO> fontesDeDados = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -117,10 +147,12 @@ public class FonteDadosDAO {
                     FonteDadosTO fonteDados = new FonteDadosTO();
                     fonteDados.setId(resultSet.getLong("id_fonte"));
 
-                    UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                    UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                    fonteDados.setUsuario(usuario);
+                    UsuarioTO usuario = new UsuarioTO();
+                    usuario.setId(resultSet.getLong("id_usuario"));
+                    usuario.setEmail(resultSet.getString("nm_email"));
+                    usuario.setNomeCompleto(resultSet.getString("nm_completo"));
 
+                    fonteDados.setUsuario(usuario);
                     fonteDados.setFonte(resultSet.getString("tp_fonte"));
                     fonteDados.setIdentificador(resultSet.getString("ds_identificador"));
                     fonteDados.setDataConexao(resultSet.getDate("dt_conexao").toLocalDate());

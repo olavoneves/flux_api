@@ -79,7 +79,26 @@ public class CompetenciaDAO {
     }
 
     public CompetenciaTO findById(Long id) {
-        String sql = "SELECT * FROM T_FLUX_COMPETENCIA WHERE id_competencia = ?";
+        String sql = """
+                SELECT
+                    comp.id_competencia,
+                    comp.nm_competencia,
+                    comp.vl_proficiencia,
+                    comp.tp_verificacao,
+                    comp.ds_prova_url,
+                    comp.dt_verificacao,
+                    comp.dt_ultima_uso,
+                    comp.vl_decay_diario,
+                    comp.st_ativo,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo,
+                    u.ds_cargo_atual,
+                    u.ds_carreira_alvo
+                FROM T_FLUX_COMPETENCIA comp
+                INNER JOIN T_FLUX_USUARIO u ON comp.id_usuario = u.id_usuario
+                WHERE comp.id_competencia = ?
+                """;
         CompetenciaTO competencia = null;
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -90,10 +109,14 @@ public class CompetenciaDAO {
                 competencia = new CompetenciaTO();
                 competencia.setId(resultSet.getLong("id_competencia"));
 
-                UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                competencia.setUsuario(usuario);
+                UsuarioTO usuario = new UsuarioTO();
+                usuario.setId(resultSet.getLong("id_usuario"));
+                usuario.setEmail(resultSet.getString("nm_email"));
+                usuario.setNomeCompleto(resultSet.getString("nm_completo"));
+                usuario.setCargoAtual(resultSet.getString("ds_cargo_atual"));
+                usuario.setCarreiraAlvo(resultSet.getString("ds_carreira_alvo"));
 
+                competencia.setUsuario(usuario);
                 competencia.setNomeCompetencia(resultSet.getString("nm_competencia"));
                 competencia.setValorProficiencia(resultSet.getInt("vl_proficiencia"));
                 competencia.setTipoVerificacao(resultSet.getString("tp_verificacao"));
@@ -115,7 +138,25 @@ public class CompetenciaDAO {
     }
 
     public ArrayList<CompetenciaTO> findAll() {
-        String sql = "SELECT * FROM T_FLUX_COMPETENCIA ORDER BY id_competencia";
+        String sql = """
+                SELECT
+                    comp.id_competencia,
+                    comp.nm_competencia,
+                    comp.vl_proficiencia,
+                    comp.tp_verificacao,
+                    comp.ds_prova_url,
+                    comp.dt_verificacao,
+                    comp.dt_ultima_uso,
+                    comp.vl_decay_diario,
+                    comp.st_ativo,
+                    u.id_usuario,
+                    u.nm_email,
+                    u.nm_completo,
+                    u.ds_cargo_atual,
+                    u.ds_carreira_alvo
+                FROM T_FLUX_COMPETENCIA comp
+                INNER JOIN T_FLUX_USUARIO u ON comp.id_usuario = u.id_usuario
+                """;
         ArrayList<CompetenciaTO> competencias = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(sql)) {
@@ -126,10 +167,14 @@ public class CompetenciaDAO {
                     CompetenciaTO competencia = new CompetenciaTO();
                     competencia.setId(resultSet.getLong("id_competencia"));
 
-                    UsuarioDAO usuarioDAO =  new UsuarioDAO();
-                    UsuarioTO usuario = usuarioDAO.findById(resultSet.getLong("id_usuario"));
-                    competencia.setUsuario(usuario);
+                    UsuarioTO usuario = new UsuarioTO();
+                    usuario.setId(resultSet.getLong("id_usuario"));
+                    usuario.setEmail(resultSet.getString("nm_email"));
+                    usuario.setNomeCompleto(resultSet.getString("nm_completo"));
+                    usuario.setCargoAtual(resultSet.getString("ds_cargo_atual"));
+                    usuario.setCarreiraAlvo(resultSet.getString("ds_carreira_alvo"));
 
+                    competencia.setUsuario(usuario);
                     competencia.setNomeCompetencia(resultSet.getString("nm_competencia"));
                     competencia.setValorProficiencia(resultSet.getInt("vl_proficiencia"));
                     competencia.setTipoVerificacao(resultSet.getString("tp_verificacao"));
